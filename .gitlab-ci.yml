@@ -1,0 +1,27 @@
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  tags:
+    - mac-runner
+
+  script:
+    - echo "Pulling latest image from Docker Hub..."
+    - docker pull jagriti30/irctc-streaming:latest
+
+    - echo "Stopping old container..."
+    - docker rm -f irctc-streaming || true
+
+    - echo "Starting new container..."
+    - docker run -d \
+        --name irctc-streaming \
+        -e DRY_RUN=true \
+        -e NUM_ROWS=20 \
+        jagriti30/irctc-streaming:latest
+
+    - echo "Checking container..."
+    - docker ps --filter "name=irctc-streaming"
+
+  only:
+    - jenkins-ci
