@@ -3,8 +3,12 @@ stages:
 
 deploy:
   stage: deploy
+
   tags:
     - mac-runner
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "jenkins-ci"'
 
   script:
     - echo "Pulling latest image from Docker Hub..."
@@ -14,14 +18,7 @@ deploy:
     - docker rm -f irctc-streaming || true
 
     - echo "Starting new container..."
-    - docker run -d \
-        --name irctc-streaming \
-        -e DRY_RUN=true \
-        -e NUM_ROWS=20 \
-        jagriti30/irctc-streaming:latest
+    - docker run -d --name irctc-streaming -e DRY_RUN=true -e NUM_ROWS=20 jagriti30/irctc-streaming:latest
 
     - echo "Checking container..."
     - docker ps --filter "name=irctc-streaming"
-
-  only:
-    - jenkins-ci
